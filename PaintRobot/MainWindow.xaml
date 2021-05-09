@@ -1,0 +1,18 @@
+﻿<Window x:Class="PaintRobot.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PaintRobot"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        <Button Content="connect" HorizontalAlignment="Left" Margin="704,14,0,0" VerticalAlignment="Top" Width="75" Click="ConnectClick"/>
+        <TextBox x:Name="text_send" HorizontalAlignment="Left" Height="150" Margin="99,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="590" AcceptsReturn="True"/>
+        <TextBlock x:Name="textConnectState" HorizontalAlignment="Left" Margin="99,16,0,0" TextWrapping="Wrap" Text="未连接" VerticalAlignment="Top" Width="590"/>
+        <Button x:Name="btn_send" Content="Send" HorizontalAlignment="Left" Margin="704,60,0,0" VerticalAlignment="Top" Width="75" Click="Btn_send_Click"/>
+        <TextBox x:Name="text_recive" HorizontalAlignment="Left" Height="165" Margin="99,222,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="590" IsEnabled="False"/>
+        <!--Button x:Name="btn_recive" Content="recive" HorizontalAlignment="Left" Margin="704,233,0,0" VerticalAlignment="Top" Width="75" Click="Btn_recive_Click"/-->
+
+    </Grid>
+</Window>
