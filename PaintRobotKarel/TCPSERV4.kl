@@ -1,0 +1,148 @@
+PROGRAM tcpserv4
+%STACKSIZE = 4000
+%NOLOCKGROUP
+%NOPAUSE=ERROR+COMMAND+TPENABLE
+%ENVIRONMENT uif
+%ENVIRONMENT sysdef
+%ENVIRONMENT memo
+%ENVIRONMENT kclop
+%ENVIRONMENT bynam
+%ENVIRONMENT fdev
+%ENVIRONMENT flbt
+%ENVIRONMENT REGOPE
+%INCLUDE klevccdf
+%INCLUDE klevkeys
+%INCLUDE klevkmsk
+-------------------------------------------------------------
+VAR
+file_var : FILE
+tmp_int1 : INTEGER
+tmp_str : STRING[128]
+tmp_str1 : STRING[128]
+recive_data : STRING[128]
+
+type_str,workPosition_str,column_str,raw_str,length_str,width_str : STRING[30]
+workPosition,column,raw,length,width : INTEGER
+
+i : INTEGER
+status : INTEGER
+entry : INTEGER
+n : INTEGER
+-------------------------------------------------------------------------------
+BEGIN
+    FORCE_SPMENU(TP_PANEL,SPI_TPUSER,1)
+	SET_FILE_ATR (file_var, ATR_IA)
+	-- 54600
+	SET_VAR(entry, '*SYSTEM*','$HOSTS_CFG[3].$SERVER_PORT',5233,STATUS)
+	WRITE('Connecting......',CR)
+	MSG_CONNECT('S3:',STATUS)
+    IF STATUS = 0 THEN
+        -- Open S3:
+        WRITE ('done',CR)
+        REPEAT
+            SET_FILE_ATR(file_var,ATR_IA)
+	        SET_FILE_ATR(file_var,ATR_READAHD,2)
+            OPEN FILE file_var ('rw','S3:')
+            status = IO_STATUS(file_var)
+            IF status = 0 THEN
+                -- write an integer
+
+                --WRITE('Reading',CR)
+                -- Read 10 bytes
+                --BYTES_AHEAD(file_var, entry, status)
+                --WRITE(entry, status)
+                DELAY 100
+                READ file_var (tmp_str)
+                n = STR_LEN(tmp_str)
+                WAIT FOR n > 0
+                    DELAY 100
+	                status = IO_STATUS(file_var)
+	                --WRITE (status)
+	                -- Write 10 bytes
+	                recive_data = tmp_str
+	                WRITE ('recived data is: ', recive_data, CR)
+	                --给上位机发送消息
+	                --WRITE file_var('connect ok!')
+	                    
+	                DELAY 100
+	                CLOSE FILE file_var
+	                --CALL_PROG('SENDMESSAGE',status)
+
+                    --接收到开始信号TP指令
+	                IF  SUB_STR(recive_data, 1, 2)='TP' THEN
+
+                        i = 1
+                        type_str = ''
+                        workPosition_str = ''
+                        column_str = ''
+                        raw_str = ''
+                        length_str = ''
+                        width_str = ''
+
+                        workPosition = 0
+                        column = 0
+                        raw = 0
+                        length = 0
+                        width = 0
+
+                        REPEAT
+                            type_str = type_str + SUB_STR(recive_data,i,1)
+                            i = i+1
+                        UNTIL SUB_STR(recive_data,i,1) = ','
+
+                        REPEAT
+                            workPosition_str = workPosition_str + SUB_STR(recive_data,i,1)
+                            i = i+1
+                        UNTIL SUB_STR(recive_data,i,1) = ','
+
+                        REPEAT
+                            column_str = column_str + SUB_STR(recive_data,i,1)
+                            i = i+1
+                        UNTIL SUB_STR(recive_data,i,1) = ','
+
+                        REPEAT
+                            raw_str = raw_str + SUB_STR(recive_data,i,1)
+                            i = i+1
+                        UNTIL SUB_STR(recive_data,i,1) = ','
+
+                        REPEAT
+                            length_str = length_str + SUB_STR(recive_data,i,1)
+                            i = i+1
+                        UNTIL SUB_STR(recive_data,i,1) = ','
+
+                        REPEAT
+                            width_str = width_str + SUB_STR(recive_data,i,1)
+                            i = i+1
+                        UNTIL SUB_STR(recive_data,i,1) = ','
+
+                        --参数字符串转INT
+                        CNV_STR_INT(workPosition_str,workPosition)
+                        CNV_STR_INT(column_str,column)
+                        CNV_STR_INT(raw_str,raw)
+                        CNV_STR_INT(length_str,length)
+                        CNV_STR_INT(width_str,width)
+
+                        --参数存储入INT寄存器
+                        SET_INT_REG(100,workPosition,status)
+                        SET_INT_REG(101,column,status)
+                        SET_INT_REG(102,raw,status)
+                        SET_INT_REG(103,length,status)
+                        SET_INT_REG(104,width,status)
+                        
+
+	                    WRITE ('TP START.. ', CR)
+	                    CALL_PROG(type_str, status)
+	                    	
+	                    WRITE ('TP COMPLETE', CR)
+	                ENDIF    	
+                    status = IO_STATUS(file_var)
+                    --WRITE (status, cr)
+            ENDIF
+            DELAY 100
+        UNTIL(recive_data='stop')
+        WRITE('Disconnecting..',CR)
+        MSG_DISCO('S3:',status)
+        WRITE('Done.',CR)
+    ENDIF
+END tcpserv4
+

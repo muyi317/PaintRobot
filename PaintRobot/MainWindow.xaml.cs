@@ -36,6 +36,7 @@ namespace PaintRobot
         public int m_raw;
         public int m_length;
         public int m_width;
+        private Painting paint;
 
         public MainWindow()
         {
@@ -57,9 +58,15 @@ namespace PaintRobot
         }
 
         // 接收机械臂发送的消息
-        public void reciveData(object sender, EventArgs e)
+        public void Btn_recive_Click(object sender, EventArgs e)
         {
             text_recive.Text = m_client.reciveData();
+        }
+
+        private void btn_start_Click(object sender, RoutedEventArgs e)
+        {
+            paint = new Painting("DONGFENG", 0, 0, 0, 0, 0);
+            paint.startPaint();
         }
     }
 }

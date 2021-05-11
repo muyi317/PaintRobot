@@ -1,0 +1,53 @@
+PROGRAM SendPoint
+%COMMENT = '0.0.0.0 - 00'
+%ALPHABETIZE
+%ENVIRONMENT STRNG
+%ENVIRONMENT REGOPE
+%INCLUDE KLEVKEYS
+%INCLUDE KLEVKMSK
+%INCLUDE KLEVCCDF
+%INCLUDE KLIOUOP
+%INCLUDE KLIOTYPS
+
+----------------------------------------------------
+
+VAR
+file_var : FILE
+status : INTEGER
+point1,point2 : XYZWPR
+x1,y1,z1,w1,p1,r1,x2,y2,z2,w2,p2,r2 : STRING[20]
+                
+----------------------------------------------------
+BEGIN
+    SET_FILE_ATR(file_var,ATR_IA)
+	SET_FILE_ATR(file_var,ATR_READAHD,2)
+	--open file 
+	OPEN FILE file_var('rw','S3:')
+	STATUS = IO_STATUS(file_var)
+
+    IF STATUS = 0 THEN	 
+        --获取p9，p10点的位姿
+        point1 = GET_POS_REG(9, status)
+        point2 = GET_POS_REG(10, status)
+
+        CNV_REAL_STR(point1.x,10,3,X1)
+        CNV_REAL_STR(point1.y,10,3,Y1)
+        CNV_REAL_STR(point1.z,10,3,Z1)
+        CNV_REAL_STR(point1.w,10,3,W1)
+        CNV_REAL_STR(point1.p,10,3,P1)
+        CNV_REAL_STR(point1.r,10,3,R1)
+
+        CNV_REAL_STR(point2.x,10,3,X2)
+        CNV_REAL_STR(point2.y,10,3,Y2)
+        CNV_REAL_STR(point2.z,10,3,Z2)
+        CNV_REAL_STR(point2.w,10,3,W2)
+        CNV_REAL_STR(point2.p,10,3,P2)
+        CNV_REAL_STR(point2.r,10,3,R2)
+
+        WRITE file_var(X1,',',Y1,',',Z1,',',W1,',',P1,',',R1,';',X2,',',Y2,',',Z2,',',W2,',',P2,',',R2)
+
+        CLOSE FILE  file_var
+    ELSE
+        WRITE(' Open File Failed ',CR)
+    ENDIF
+END SendPoint

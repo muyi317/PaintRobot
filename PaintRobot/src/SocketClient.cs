@@ -59,18 +59,27 @@ namespace PaintRobot
             }
             return message;
         }
+
+        public void stopClient()
+        {
+            _socket.Close();
+        }
+
         public void sendData(string data)
         {
             //6.0 像服务器发送消息
             _socket.Send(Encoding.UTF8.GetBytes(data));
         }
+
         public string reciveData()
         {
             int length = 0;
+            string message = "";
             try
             {
                 //5.0 接收数据
                 length = _socket.Receive(buffer);
+                message = Encoding.UTF8.GetString(buffer, 0, length);
             }
             catch (System.Net.Sockets.SocketException)
             {
@@ -79,7 +88,10 @@ namespace PaintRobot
 
             if (length > 0)
             {
-                return Encoding.UTF8.GetString(buffer, 0, length);
+                Thread.Sleep(500);
+                length = _socket.Receive(buffer);
+                message = message + Encoding.UTF8.GetString(buffer, 0, length);
+                return message; 
             }
             else
             {

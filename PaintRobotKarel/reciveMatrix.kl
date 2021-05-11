@@ -1,0 +1,212 @@
+PROGRAM recvMatrix
+%RWACCESS
+%STACKSIZE = 4000
+%NOPAUSE = ERROR+COMMAND+TPENABLE
+%NOLOCKGROUP
+%ALPHABETIZE
+%NOABORT = ERROR+TPENABLE
+%NOPAUSESHFT
+
+VAR
+entry:INTEGER
+n_bytes : INTEGER
+str : STRING[240]
+m1_str,m2_str,m3_str,m4_str,m5_str,m6_str,m7_str,m8_str,m9_str,m10_str,m11_str,m12_str,m13_str,m14_str,m15_str,m16_str : STRING[15]
+m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14,m15,m16 : REAL
+STATUS : INTEGER
+file_var : FILE
+i,j : INTEGER
+offset_data : STRING[250]
+
+BEGIN 
+SET_FILE_ATR(file_var,ATR_IA)
+SET_FILE_ATR(file_var,ATR_READAHD,2)
+OPEN FILE file_var('rw','S3:')
+	offset_data = ''
+	j = 0
+	--STATUS=SET_PORT_ATR (PORT_2, ATR_READAHD, 1)
+	REPEAT
+	BYTES_AHEAD(file_var,n_bytes,STATUS)
+	
+	UNTIL n_bytes>=1
+
+	DELAY 100
+
+	REPEAT
+		READ file_var(str::1)
+		STATUS = IO_STATUS(file_var)
+		offset_data = offset_data + str
+		j =j+1
+		n_bytes=n_bytes-1
+	UNTIL (STATUS<>0) OR (n_bytes=0)
+	
+	CLOSE FILE file_var
+
+	SET_VAR(entry,'*numreg*', '$NUMREG[2]' ,0, STATUS)
+	
+	i = 1
+    m1_str = ''
+	m2_str = ''
+	m3_str = ''
+	m4_str = ''
+	m5_str = ''
+	m6_str = ''
+	m7_str = ''
+    m8_str = ''
+	m9_str = ''
+	m10_str = ''
+	m11_str = ''
+	m12_str = ''
+	m13_str = ''
+	m14_str = ''
+    m15_str = ''
+	m16_str = ''
+
+	REPEAT
+	m1_str = m1_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m1_str,m1)
+    
+	REPEAT
+	m2_str = m2_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m2_str,m2)
+
+
+	REPEAT
+	m3_str = m3_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m3_str,m3)
+
+
+	REPEAT
+	m4_str = m4_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m4_str,m4)
+
+
+	REPEAT
+	m5_str = m5_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m5_str,m5)
+
+
+	REPEAT
+	m6_str = m6_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m6_str,m6)
+
+
+	REPEAT
+	m7_str = m7_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m7_str,m7)
+
+
+	REPEAT
+	m8_str = m8_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m8_str,m8)
+
+
+	REPEAT
+	m9_str = m9_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m9_str,m9)
+
+
+	REPEAT
+	m10_str = m10_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m10_str,m10)
+
+
+	REPEAT
+	m11_str = m11_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m11_str,m11)
+
+
+	REPEAT
+	m12_str = m12_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m12_str,m12)
+
+
+	REPEAT
+	m13_str = m13_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m13_str,m13)
+
+
+	REPEAT
+	m14_str = m14_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m14_str,m14)
+
+
+	REPEAT
+	m15_str = m15_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m15_str,m15)
+
+
+	REPEAT
+	m16_str = m16_str + SUB_STR(offset_data,i,1)
+	i = i+1
+	UNTIL SUB_STR(offset_data,i,1) = ','
+	i = i+1
+	CNV_STR_REAL(m16_str,m16)
+
+	WRITE('Transform matrix recv successful ',CR)
+
+    --数据写入寄存器
+	SET_REAL_REG(110,m1,STATUS)
+    SET_REAL_REG(111,m2,STATUS)
+    SET_REAL_REG(112,m3,STATUS)
+    SET_REAL_REG(113,m4,STATUS)
+    SET_REAL_REG(114,m5,STATUS)
+    SET_REAL_REG(115,m6,STATUS)
+    SET_REAL_REG(116,m7,STATUS)
+    SET_REAL_REG(117,m8,STATUS)
+    SET_REAL_REG(118,m9,STATUS)
+    SET_REAL_REG(119,m10,STATUS)
+    SET_REAL_REG(120,m11,STATUS)
+    SET_REAL_REG(121,m12,STATUS)
+    SET_REAL_REG(122,m13,STATUS)
+    SET_REAL_REG(123,m14,STATUS)
+    SET_REAL_REG(124,m15,STATUS)
+    SET_REAL_REG(125,m16,STATUS)
+
+	DELAY 100
+END recvMatrix
