@@ -1,7 +1,11 @@
 PROGRAM tcpserv4
+%RWACCESS
 %STACKSIZE = 4000
+%NOPAUSE = ERROR+COMMAND+TPENABLE
 %NOLOCKGROUP
-%NOPAUSE=ERROR+COMMAND+TPENABLE
+%ALPHABETIZE
+%NOABORT = ERROR+TPENABLE
+%NOPAUSESHFT
 %ENVIRONMENT uif
 %ENVIRONMENT sysdef
 %ENVIRONMENT memo
@@ -22,12 +26,16 @@ tmp_str1 : STRING[128]
 recive_data : STRING[128]
 
 type_str,workPosition_str,column_str,raw_str,length_str,width_str : STRING[30]
-workPosition,column,raw,length,width : INTEGER
+workPosition,column,raw,length,width : REAL
 
 i : INTEGER
 status : INTEGER
 entry : INTEGER
-n : INTEGER
+m,n : INTEGER
+current_row,current_col : INTEGER
+
+init_pos : XYZWPR
+
 -------------------------------------------------------------------------------
 BEGIN
     FORCE_SPMENU(TP_PANEL,SPI_TPUSER,1)
@@ -71,7 +79,7 @@ BEGIN
                     --接收到开始信号TP指令
 	                IF  SUB_STR(recive_data, 1, 2)='TP' THEN
 
-                        i = 1
+                        i = 3
                         type_str = ''
                         workPosition_str = ''
                         column_str = ''
@@ -89,26 +97,31 @@ BEGIN
                             type_str = type_str + SUB_STR(recive_data,i,1)
                             i = i+1
                         UNTIL SUB_STR(recive_data,i,1) = ','
+                        i = i+1
 
                         REPEAT
                             workPosition_str = workPosition_str + SUB_STR(recive_data,i,1)
                             i = i+1
                         UNTIL SUB_STR(recive_data,i,1) = ','
+                        i = i+1
 
                         REPEAT
                             column_str = column_str + SUB_STR(recive_data,i,1)
                             i = i+1
                         UNTIL SUB_STR(recive_data,i,1) = ','
+                        i = i+1
 
                         REPEAT
                             raw_str = raw_str + SUB_STR(recive_data,i,1)
                             i = i+1
                         UNTIL SUB_STR(recive_data,i,1) = ','
+                        i = i+1
 
                         REPEAT
                             length_str = length_str + SUB_STR(recive_data,i,1)
                             i = i+1
                         UNTIL SUB_STR(recive_data,i,1) = ','
+                        i = i+1
 
                         REPEAT
                             width_str = width_str + SUB_STR(recive_data,i,1)
@@ -116,29 +129,74 @@ BEGIN
                         UNTIL SUB_STR(recive_data,i,1) = ','
 
                         --参数字符串转INT
-                        CNV_STR_INT(workPosition_str,workPosition)
-                        CNV_STR_INT(column_str,column)
-                        CNV_STR_INT(raw_str,raw)
-                        CNV_STR_INT(length_str,length)
-                        CNV_STR_INT(width_str,width)
+                        CNV_STR_REAL(workPosition_str,workPosition)
+                        CNV_STR_REAL(column_str,column)
+                        CNV_STR_REAL(raw_str,raw)
+                        CNV_STR_REAL(length_str,length)
+                        CNV_STR_REAL(width_str,width)
 
                         --参数存储入INT寄存器
-                        SET_INT_REG(100,workPosition,status)
-                        SET_INT_REG(101,column,status)
-                        SET_INT_REG(102,raw,status)
-                        SET_INT_REG(103,length,status)
-                        SET_INT_REG(104,width,status)
-                        
+                        SET_STR_REG(1, type_str, status)
+                        SET_REAL_REG(100,workPosition,status)
+                        SET_REAL_REG(101,column,status)
+                        SET_REAL_REG(102,raw,status)
+                        SET_REAL_REG(103,length,status)
+                        SET_REAL_REG(104,width,status)
 
 	                    WRITE ('TP START.. ', CR)
-	                    CALL_PROG(type_str, status)
-	                    	
+
+                        --切换照相程序
+                        CALL_PROG('PHOTOCHANGE',status)
+                        DELAY(6000)
+
+                        --1、开始照相
+                        --PHOTO程序中应识别工位，进行
+                        --CALL_PROG('PHOTO',status)
+
+                        --2、将两点位置传送至上位机
+                        --CALL_PROG('SENDPOINT',status)
+
+						--3、等待上位机回传变换矩阵
+						--CALL_PROG('RECVMATRIX',status)
+
+                        --轨迹程序中应包含以上3步
+
+                        init_pos.x = 0.0
+                        init_pos.y = 0.0
+                        init_pos.z = 0.0
+                        init_pos.w = 0.0
+                        init_pos.p = 0.0
+                        init_pos.r = 0.0
+                        init_pos = GET_POS_REG(4, status)
+                        SET_POS_REG(4, init_pos, status)
+                        SET_POS_REG(21, init_pos, status)
+                        current_col = 1
+                        current_row = 1
+                        
+                        REPEAT
+
+                            REPEAT
+                                --计算列偏置
+                                init_pos.x = (current_row - 1) * width
+                                --SET_POS_REG(4, init_pos, status)
+                                --走轨迹
+                                CALL_PROG('TP'+type_str, status)
+                                current_row = current_row + 1
+                            UNTIL(current_row > raw)
+
+                            --计算行偏置
+                            init_pos.y = (current_col - 1) * length
+                            --初始化列偏置
+                            current_row = 1
+                            current_col = current_col + 1
+	                    UNTIL(current_col > column)
 	                    WRITE ('TP COMPLETE', CR)
-	                ENDIF    	
+	                ENDIF
                     status = IO_STATUS(file_var)
                     --WRITE (status, cr)
             ENDIF
             DELAY 100
+            WRITE file_var('stop')	
         UNTIL(recive_data='stop')
         WRITE('Disconnecting..',CR)
         MSG_DISCO('S3:',status)

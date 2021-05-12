@@ -7,13 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Button Content="connect" HorizontalAlignment="Left" Margin="704,14,0,0" VerticalAlignment="Top" Width="75" Click="ConnectClick"/>
-        <TextBox x:Name="text_send" HorizontalAlignment="Left" Height="150" Margin="99,48,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="590" AcceptsReturn="True"/>
-        <TextBlock x:Name="textConnectState" HorizontalAlignment="Left" Margin="99,16,0,0" TextWrapping="Wrap" Text="未连接" VerticalAlignment="Top" Width="590"/>
-        <Button x:Name="btn_send" Content="Send" HorizontalAlignment="Left" Margin="704,60,0,0" VerticalAlignment="Top" Width="75" Click="Btn_send_Click"/>
-        <TextBox x:Name="text_recive" HorizontalAlignment="Left" Height="165" Margin="99,222,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="590" IsEnabled="False"/>
-        <Button x:Name="btn_recive" Content="recive" HorizontalAlignment="Left" Margin="704,233,0,0" VerticalAlignment="Top" Width="75" Click="Btn_recive_Click"/>
-        <Button x:Name="btn_start" Content="start" HorizontalAlignment="Left" Margin="704,353,0,0" VerticalAlignment="Top" Width="75" Click="btn_start_Click"/>
-
+        <Button Content="connect" HorizontalAlignment="Left" Margin="351,95,0,0" VerticalAlignment="Top" Width="75" Click="ConnectClick"/>
+        <Button x:Name="btn_start" Content="start" HorizontalAlignment="Left" Margin="351,155,0,0" VerticalAlignment="Top" Width="75" Click="btn_start_Click"/>
+        <Button x:Name="btn_stop" Content="stop" HorizontalAlignment="Left" Margin="351,211,0,0" VerticalAlignment="Top" Width="75" Click="btn_stop_Click"/>
     </Grid>
 </Window>

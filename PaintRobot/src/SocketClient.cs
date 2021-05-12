@@ -48,7 +48,6 @@ namespace PaintRobot
                 //4.0 建立连接
                 _socket.Connect(endPoint);
                 message = "连接成功";
-                _socket.ReceiveTimeout = 1000;
             }
             catch (SocketException ex)
             {
@@ -62,6 +61,8 @@ namespace PaintRobot
 
         public void stopClient()
         {
+            sendData("stop\n");
+            Thread.Sleep(1000);
             _socket.Close();
         }
 
@@ -89,8 +90,18 @@ namespace PaintRobot
             if (length > 0)
             {
                 Thread.Sleep(500);
-                length = _socket.Receive(buffer);
-                message = message + Encoding.UTF8.GetString(buffer, 0, length);
+                try
+                {
+                    _socket.ReceiveTimeout = 500;
+                    //5.0 接收数据
+                    length = _socket.Receive(buffer);
+                    message = message + Encoding.UTF8.GetString(buffer, 0, length);
+                }
+                catch (System.Net.Sockets.SocketException)
+                {
+
+                }
+                _socket.ReceiveTimeout = -1;
                 return message; 
             }
             else

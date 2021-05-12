@@ -34,9 +34,6 @@ namespace PaintRobot
             m_raw = raw;
             m_length = length;
             m_width = width;
-
-            // 1、建立连接
-            connect();
         }
 
         // 机械臂动作流程
@@ -50,9 +47,9 @@ namespace PaintRobot
             {
                 // 3、等待FANUC传入两个坐标点,计算变换矩阵并发送
                 string message = reciveMessage();
+                // MessageBox.Show(message);
 
-                MessageBox.Show(message);
-
+                // FANUC发送stop时退出循环
                 if (message == "stop")
                 {
                     break;
@@ -71,7 +68,6 @@ namespace PaintRobot
                     }
                 }
 
-                MessageBox.Show(Convert.ToString(point1[1,2]), Convert.ToString(point2[1,2]));
                 Transformer trans = new Transformer(point1, point2);
                 double[,] transformMatrix = trans.m_transformMatrix.ToArray();                // 变换矩阵
 
@@ -89,13 +85,23 @@ namespace PaintRobot
             }
         }
 
-        #region 私有函数
+
         // 与FANUC建立通讯
-        private void connect()
+        public void connect()
         {
             m_client = new SocketClient("192.168.1.1", 5233);
             var linkStatus = m_client.StartClient();
         }
+
+        // 断开FANUC通讯，结束FANUC端程序
+        public void disconnect()
+        {
+            m_client.stopClient();
+        }
+
+        #region 私有函数
+
+      
 
         // 向机械臂发送消息
         private void sendMessage(string message)
